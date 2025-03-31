@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>음식 추천 사이트</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      font-size: 2.5em;
+    }
+
+    #foodName {
+      font-size: 1.5em;
+      margin-top: 20px;
+      color: #333;
+    }
+
+    #foodImage {
+      margin-top: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #recommendButton {
+      background-color: #4CAF50;
+      color: white;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #recommendButton:hover {
+      background-color: #45a049;
+    }
+
+    #container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="container">
+    <h1>오늘의 음식 추천</h1>
+    <button id="recommendButton">추천 받기</button>
+    <h2 id="foodName">추천 음식: </h2>
+    <img id="foodImage" src="/images/처음 들어올때 보이는 사진.jpg" alt="추천 음식 이미지" style="width: 300px; height: auto;"/>
+  </div>
+
+  <script>
+    document.getElementById('recommendButton').addEventListener('click', async function() {
+      try {
+        const response = await fetch('http://localhost:3000/recommend');
+        if (!response.ok) throw new Error('네트워크 응답이 정상적이지 않습니다.');
+
+        const data = await response.json();
+        const food = data.recommendedFood;
+
+        // 음식 이름과 이미지 표시
+        document.getElementById('foodName').textContent = `추천 음식: ${food.name}`;
+        document.getElementById('foodImage').src = food.image_url;  // 이미지 URL 업데이트
+        document.getElementById('foodImage').src = 'http://localhost:3000/'+ food.image_url;  // 이미지 URL 업데이트
+      } catch (error) {
+        console.error('음식 추천 API 호출 중 오류 발생:', error);
+      }
+    });
+  </script>
+
+</body>
+</html>
