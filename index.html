@@ -58,28 +58,22 @@
   <h1>오늘의 음식 추천</h1>
 
   <div id="questionContainer">
-    <div>
-      <label>1. 매운 정도:</label>
-      <select id="spiceLevel">
-        <option value="매운">매운 음식</option>
-        <option value="적당히 매운">적당히 매운 음식</option>
-        <option value="안 매운">안 매운 음식</option>
-        <option value="상관 없음">상관 없음</option>
-      </select>
-    </div>
 
     <div>
-      <label>2. 음식 종류:</label>
+      <label>1. 음식 종류:</label>
       <select id="foodType">
         <option value="고기">고기 음식</option>
         <option value="채소">채소 음식</option>
         <option value="해산물">해산물 음식</option>
+        <option value="밀">밀 음식</option>
+        <option value="쌀">쌀 음식</option>
+
         <option value="상관 없음">상관 없음</option>
       </select>
     </div>
 
     <div>
-      <label>3. 국물 여부:</label>
+      <label>2. 국물 여부:</label>
       <select id="soupType">
         <option value="국물">국물 음식</option>
         <option value="국물 없음">국물 없는 음식</option>
@@ -88,7 +82,7 @@
     </div>
 
     <div>
-      <label>4. 음식 종류:</label>
+      <label>3. 음식 종류:</label>
       <select id="cuisine">
         <option value="한식">한식</option>
         <option value="양식">양식</option>
@@ -98,49 +92,30 @@
       </select>
     </div>
 
-    <div>
-      <label>5. 요리 종류:</label>
-      <select id="mealType">
-        <option value="요리">요리</option>
-        <option value="간식">간식</option>
-        <option value="상관 없음">상관 없음</option>
-      </select>
-    </div>
 
     <button id="recommendButton">추천 받기</button>
 
     <h2 id="foodName">추천 음식: </h2>
     <img id="foodImage" src="http://localhost:3000/intro-image" alt="처음 들어올 때 보일 이미지" style="width: 300px; height: auto;"/>
+
   </div>
 
   <script>
     document.getElementById('recommendButton').addEventListener('click', async function() {
-      const spiceLevel = document.getElementById('spiceLevel').value;
       const foodType = document.getElementById('foodType').value;
       const soupType = document.getElementById('soupType').value;
       const cuisine = document.getElementById('cuisine').value;
-      const mealType = document.getElementById('mealType').value;
-
+  
       try {
-        const response = await fetch('http://localhost:3000/recommend', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            spiceLevel,
-            foodType,
-            soupType,
-            cuisine,
-            mealType,
-          })
+        const response = await fetch(`http://localhost:3000/recommend-food?foodType=${foodType}&soupType=${soupType}&cuisine=${cuisine}`, {
+          method: 'GET',  // GET 방식으로 변경
         });
-
+  
         if (!response.ok) throw new Error('네트워크 응답이 정상적이지 않습니다.');
-
+  
         const data = await response.json();
-        const food = data.recommendedFood;
-
+        const food = data;  // 바로 데이터가 전달되니까 data를 사용
+  
         // 음식 이름과 이미지 표시
         document.getElementById('foodName').textContent = `추천 음식: ${food.name}`;
         document.getElementById('foodImage').src = 'http://localhost:3000' + food.image_url;  // 이미지 URL 업데이트
@@ -149,6 +124,7 @@
       }
     });
   </script>
+  
 
 </body>
 </html>
