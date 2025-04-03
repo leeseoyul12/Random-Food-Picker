@@ -21,20 +21,76 @@
       font-size: 2.5em;
     }
 
+    /* 로그인/회원가입 버튼 위치 */
+    #authButtons {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    #authButtons button {
+      background-color: #ffffff;
+      color: #4CAF50;
+      border: 1px solid #4CAF50;
+      padding: 10px 10px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-left: 5px;
+      border-radius: 5px;
+      margin-top: 30px;
+    }
+
+    #authButtons button:hover {
+      background-color: #4CAF50;
+      color: white;
+    }
+
     #questionContainer {
+      margin-top: 50px;
+    }
+
+    /* 음식 이름과 사진을 담을 박스 */
+    #foodBox {
       margin-top: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      text-align: center;
     }
 
     #foodName {
       font-size: 1.5em;
-      margin-top: 20px;
+      margin-bottom: 10px;
       color: #333;
     }
 
     #foodImage {
-      margin-top: 20px;
+      width: 300px;
+      height: 300px;
+      object-fit: contain;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: #fff;
+    }
+
+    /* 음식 설명 박스 */
+    #foodDescriptionBox {
+      margin-top: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      text-align: left;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #foodDescription {
+      font-size: 1.2em;
+      color: #555;
     }
 
     #recommendButton {
@@ -57,8 +113,12 @@
 
   <h1>오늘의 음식 추천</h1>
 
-  <div id="questionContainer">
+  <div id="authButtons">
+    <button id="loginBtn">로그인</button>
+    <button id="signupBtn">회원가입</button>
+  </div>
 
+  <div id="questionContainer">
     <div>
       <label>1. 음식 종류:</label>
       <select id="foodType">
@@ -67,7 +127,6 @@
         <option value="해산물">해산물 음식</option>
         <option value="밀">밀 음식</option>
         <option value="쌀">쌀 음식</option>
-
         <option value="상관 없음">상관 없음</option>
       </select>
     </div>
@@ -92,39 +151,55 @@
       </select>
     </div>
 
-
     <button id="recommendButton">추천 받기</button>
+  </div>
 
+  <div id="foodBox">
     <h2 id="foodName">추천 음식: </h2>
-    <img id="foodImage" src="http://localhost:3000/intro-image" alt="처음 들어올 때 보일 이미지" style="width: 300px; height: auto;"/>
+    <img id="foodImage" src="http://localhost:3000/intro-image" alt="처음 들어올 때 보일 이미지"/>
+  </div>
 
+  <div id="foodDescriptionBox">
+    <p id="foodDescription">맛있는 음식을 추천 받으세요~!</p>
   </div>
 
   <script>
+    document.getElementById('loginBtn').addEventListener('click', function() {
+      // 로그인 버튼을 누르면 /login 페이지로 이동
+      window.location.href = '/login';
+    });
+
+    document.getElementById('signupBtn').addEventListener('click', function() {
+      // 회원가입 버튼을 누르면 /signup 페이지로 이동
+      window.location.href = '/signup';
+    });
+
     document.getElementById('recommendButton').addEventListener('click', async function() {
       const foodType = document.getElementById('foodType').value;
       const soupType = document.getElementById('soupType').value;
       const cuisine = document.getElementById('cuisine').value;
-  
+
       try {
         const response = await fetch(`http://localhost:3000/recommend-food?foodType=${foodType}&soupType=${soupType}&cuisine=${cuisine}`, {
-          method: 'GET',  // GET 방식으로 변경
+          method: 'GET',
         });
-  
+
         if (!response.ok) throw new Error('네트워크 응답이 정상적이지 않습니다.');
-  
+
         const data = await response.json();
-        const food = data;  // 바로 데이터가 전달되니까 data를 사용
-  
-        // 음식 이름과 이미지 표시
-        document.getElementById('foodName').textContent = `추천 음식: ${food.name}`;
-        document.getElementById('foodImage').src = 'http://localhost:3000' + food.image_url;  // 이미지 URL 업데이트
+        if (data.name) {
+          document.getElementById('foodName').textContent = `추천 음식: ${data.name}`;
+          document.getElementById('foodImage').src = 'http://localhost:3000' + data.image_url;
+          document.getElementById('foodDescription').textContent = data.description || '설명이 없습니다.';
+        } else {
+          document.getElementById('foodName').textContent = '추천할 음식이 없습니다.';
+          document.getElementById('foodImage').src = 'http://localhost:3000/intro-image';
+          document.getElementById('foodDescription').textContent = '';
+        }
       } catch (error) {
         console.error('음식 추천 API 호출 중 오류 발생:', error);
       }
     });
   </script>
-  
-
 </body>
 </html>
