@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>음식 추천 사이트</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Random-Food-picker</title>
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -21,7 +21,6 @@
       font-size: 2.5em;
     }
 
-    /* 로그인/회원가입 버튼 위치 */
     #authButtons {
       position: absolute;
       top: 20px;
@@ -49,7 +48,6 @@
       margin-top: 50px;
     }
 
-    /* 음식 이름과 사진을 담을 박스 */
     #foodBox {
       margin-top: 20px;
       background: white;
@@ -67,15 +65,14 @@
     }
 
     #foodImage {
-      width: 300px;
-      height: 300px;
+      max-width: 100%;
+      height: auto;
       object-fit: contain;
       border-radius: 10px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       background-color: #fff;
     }
 
-    /* 음식 설명 박스 */
     #foodDescriptionBox {
       margin-top: 20px;
       background: white;
@@ -102,6 +99,7 @@
       border-radius: 5px;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      margin-top: 20px;
     }
 
     #recommendButton:hover {
@@ -111,7 +109,6 @@
 </head>
 <body>
 
-  <h1>오늘의 음식 추천</h1>
 
   <div id="authButtons">
     <button id="loginBtn">로그인</button>
@@ -121,32 +118,36 @@
   <div id="questionContainer">
     <div>
       <label>1. 음식 종류:</label>
-      <select id="foodType">
-        <option value="고기">고기 음식</option>
-        <option value="채소">채소 음식</option>
-        <option value="해산물">해산물 음식</option>
-        <option value="밀">밀 음식</option>
-        <option value="쌀">쌀 음식</option>
+      <select id="category">
+        <option disabled selected>선택해 주세요</option>
+        <option value="밥류">밥류</option>
+        <option value="면류">면류</option>
+        <option value="국물요리">국물요리</option>
+        <option value="분식">분식</option>
+        <option value="튀김">튀김</option>
+        <option value="구이">구이</option>
         <option value="상관 없음">상관 없음</option>
       </select>
     </div>
 
     <div>
-      <label>2. 국물 여부:</label>
-      <select id="soupType">
-        <option value="국물">국물 음식</option>
-        <option value="국물 없음">국물 없는 음식</option>
-        <option value="상관 없음">상관 없음</option>
-      </select>
-    </div>
-
-    <div>
-      <label>3. 음식 종류:</label>
+      <label>2. 나라별 음식:</label>
       <select id="cuisine">
+        <option disabled selected>선택해 주세요</option>
         <option value="한식">한식</option>
         <option value="양식">양식</option>
         <option value="중식">중식</option>
         <option value="일식">일식</option>
+        <option value="상관 없음">상관 없음</option>
+      </select>
+    </div>
+
+    <div>
+      <label>3. 매움 유무:</label>
+      <select id="spicy">
+        <option disabled selected>선택해 주세요</option>
+        <option value="매운맛">매운맛</option>
+        <option value="안매운맛">안매운맛</option>
         <option value="상관 없음">상관 없음</option>
       </select>
     </div>
@@ -164,27 +165,27 @@
   </div>
 
   <script>
-    document.getElementById('loginBtn').addEventListener('click', function() {
-      // 로그인 버튼을 누르면 /login 페이지로 이동
-      window.location.href = '/login';
+    document.getElementById('loginBtn').addEventListener('click', function () {
+      window.location.href = '/htmls/login.html';
     });
 
-    document.getElementById('signupBtn').addEventListener('click', function() {
-      // 회원가입 버튼을 누르면 /signup 페이지로 이동
-      window.location.href = '/signup';
+    document.getElementById('signupBtn').addEventListener('click', function () {
+      window.location.href = '/htmls/signup.html';
     });
 
-    document.getElementById('recommendButton').addEventListener('click', async function() {
-      const foodType = document.getElementById('foodType').value;
-      const soupType = document.getElementById('soupType').value;
+    document.getElementById('recommendButton').addEventListener('click', async function () {
+      const category = document.getElementById('category').value;
       const cuisine = document.getElementById('cuisine').value;
+      const spicy = document.getElementById('spicy').value;
+
+      if (!category || !cuisine || !spicy) {
+        alert('모든 항목을 선택해 주세요!');
+        return;
+      }
 
       try {
-        const response = await fetch(`http://localhost:3000/recommend-food?foodType=${foodType}&soupType=${soupType}&cuisine=${cuisine}`, {
-          method: 'GET',
-        });
-
-        if (!response.ok) throw new Error('네트워크 응답이 정상적이지 않습니다.');
+        const response = await fetch(`http://localhost:3000/recommend-food?category=${category}&cuisine=${cuisine}&spicy=${spicy}`);
+        if (!response.ok) throw new Error('네트워크 오류');
 
         const data = await response.json();
         if (data.name) {
@@ -192,12 +193,13 @@
           document.getElementById('foodImage').src = 'http://localhost:3000' + data.image_url;
           document.getElementById('foodDescription').textContent = data.description || '설명이 없습니다.';
         } else {
-          document.getElementById('foodName').textContent = '추천할 음식이 없습니다.';
+          document.getElementById('foodName').textContent = '추천 결과가 없습니다.';
           document.getElementById('foodImage').src = 'http://localhost:3000/intro-image';
-          document.getElementById('foodDescription').textContent = '';
+          document.getElementById('foodDescription').textContent = '죄송합니다, 선택한 조건에 맞는 음식이 없습니다. 다른 옵션을 선택해 주세요.';
         }
       } catch (error) {
-        console.error('음식 추천 API 호출 중 오류 발생:', error);
+        console.error('추천 API 오류:', error);
+        alert('서버에 문제가 발생했습니다.');
       }
     });
   </script>
